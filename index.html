@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahel Dev - API Monitoring & Status Pages</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: white; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Navbar */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
+        .logo { font-size: 1.5rem; font-weight: bold; }
+        .logo span { color: #60a5fa; }
+        nav a { color: #94a3b8; text-decoration: none; margin-right: 20px; }
+        nav a:hover { color: white; }
+        
+        /* Hero */
+        .hero { text-align: center; padding: 100px 20px; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; }
+        .gradient-text { 
+            background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
+        .hero p { font-size: 1.3rem; color: #94a3b8; margin-bottom: 40px; }
+        .cta-button { 
+            background: linear-gradient(135deg, #60a5fa, #a78bfa); 
+            color: white; padding: 15px 40px; border-radius: 10px; text-decoration: none; 
+            font-weight: bold; display: inline-block; 
+        }
+        .cta-button:hover { transform: scale(1.05); }
+        
+        /* Features */
+        .features { padding: 80px 0; }
+        .features h2 { text-align: center; font-size: 2rem; margin-bottom: 50px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .feature-card { background: #1e293b; padding: 30px; border-radius: 15px; }
+        .feature-card h3 { color: #60a5fa; font-size: 1.3rem; margin-bottom: 10px; }
+        .feature-card p { color: #94a3b8; line-height: 1.6; }
+        .emoji { font-size: 2rem; margin-bottom: 10px; }
+        
+        /* Pricing */
+        .pricing { padding: 80px 0; text-align: center; }
+        .pricing h2 { font-size: 2rem; margin-bottom: 50px; }
+        .pricing-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .price-card { background: #1e293b; padding: 40px; border-radius: 15px; min-width: 250px; }
+        .price-card.popular { background: linear-gradient(135deg, #60a5fa, #a78bfa); }
+        .price-card h3 { color: #94a3b8; margin-bottom: 10px; }
+        .price-card.popular h3 { color: white; }
+        .price { font-size: 3rem; font-weight: bold; margin: 20px 0; }
+        .price-card ul { list-style: none; color: #94a3b8; }
+        .price-card.popular ul { color: #e0e7ff; }
+        .price-card li { margin: 10px 0; }
+        
+        /* CTA */
+        .cta-section { text-align: center; padding: 80px 0; }
+        .cta-section h2 { font-size: 2rem; margin-bottom: 20px; }
+        .cta-section p { color: #94a3b8; margin-bottom: 30px; }
+        
+        /* Footer */
+        footer { text-align: center; padding: 40px; color: #64748b; border-top: 1px solid #1e293b; }
+        footer p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav>
+            <div class="logo">🌐 <span>Sahel</span> Dev</div>
+            <div>
+                <a href="#features">المميزات</a>
+                <a href="#pricing">التسعير</a>
+                <a href="#contact">تواصل</a>
+            </div>
+        </nav>
+        
+        <!-- Hero -->
+        <section class="hero">
+            <h1 class="gradient-text">API Monitoring & Status Pages</h1>
+            <p>ابن status pages احترافية في دقائق. راقب APIs واحصل على تنبيهات فورية.</p>
+            <a href="#" class="cta-button">🚀 ابدأ مجاناً</a>
+            <p style="margin-top: 20px; color: #64748b; font-size: 0.9rem;">لا تحتاج بطاقة ائتمان</p>
+        </section>
+        
+        <!-- Features -->
+        <section class="features" id="features">
+            <h2>✨ مميزات Sahel Dev</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="emoji">⏱️</div>
+                    <h3>Uptime Monitoring</h3>
+                    <p>راقب APIs كل دقيقة من 10 مواقع مختلفة worldwide. احصل على تنبيهات فورية عند حدوث أي مشكلة.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="emoji">📊</div>
+                    <h3>Status Pages</h3>
+                    <p>ابن صفحات حالة جميلة لعملائك في دقائق. متعددة اللغات (عربي، فرنسي، إنجليزي).</p>
+                </div>
+                <div class="feature-card">
+                    <div class="emoji">🔔</div>
+                    <h3>Smart Alerting</h3>
+                    <p>تنبيهات على Slack, Discord, Email, SMS. لا تفوّت أي مشكلة مهما كانت.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="emoji">📈</div>
+                    <h3>Analytics</h3>
+                    <p>تقارير مفصلة عن uptime و latency. تاريخ 12 شهر كامل.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="emoji">🔒</div>
+                    <h3>SSO & Security</h3>
+                    <p>Google, GitHub, Microsoft SSO. SSL encryption. SOC2 compliant.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="emoji">🌍</div>
+                    <h3>Global CDN</h3>
+                    <p>10+ نقاط مراقبة حول العالم. latency أقل من 100ms.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Pricing -->
+        <section class="pricing" id="pricing">
+            <h2>💰 تسعير بسيط وشفاف</h2>
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <h3>Free</h3>
+                    <div class="price">$0</div>
+                    <ul>
+                        <li>✓ 1 API endpoint</li>
+                        <li>✓ 1 Status Page</li>
+                        <li>✓ 5 minute checks</li>
+                        <li>✓ Email alerts</li>
+                    </ul>
+                </div>
+                <div class="price-card popular">
+                    <h3>Pro 👑</h3>
+                    <div class="price">$29</div>
+                    <ul>
+                        <li>✓ Unlimited APIs</li>
+                        <li>✓ Unlimited Status Pages</li>
+                        <li>✓ 1 minute checks</li>
+                        <li>✓ Slack, Discord, SMS</li>
+                        <li>✓ 12 month history</li>
+                    </ul>
+                </div>
+                <div class="price-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">$99</div>
+                    <ul>
+                        <li>✓ Everything in Pro</li>
+                        <li>✓ SSO (Google, GitHub)</li>
+                        <li>✓ SLA 99.99%</li>
+                        <li>✓ Priority support</li>
+                        <li>✓ Custom integrations</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA -->
+        <section class="cta-section" id="contact">
+            <h2>🚀 جاهز تبدأ؟</h2>
+            <p>ابن status page في 5 دقائق. لا حاجة لرمز.</p>
+            <a href="#" class="cta-button">سجل مجاناً الآن</a>
+        </section>
+        
+        <!-- Footer -->
+        <footer>
+            <p>🌐 Sahel Dev © 2026</p>
+            <p>صنع بـ ❤️ في نواكشوط، موريتانيا 🇲🇷</p>
+        </footer>
+    </div>
+</body>
+</html>
