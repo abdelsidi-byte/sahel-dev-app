@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - Sahel Dev</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: white; min-height: 100vh; }
+        .header { background: #1e293b; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .logo { font-size: 1.5rem; }
+        .logo span { color: #60a5fa; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-name { color: #94a3b8; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+        .btn-primary { background: linear-gradient(135deg, #60a5fa, #a78bfa); color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-secondary { background: #334155; color: white; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px; }
+        .section { margin-bottom: 40px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-title { font-size: 1.5rem; }
+        .card { background: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { font-size: 1.1rem; font-weight: bold; }
+        .status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+        .status-up { background: #16a34a; }
+        .status-down { background: #dc2626; }
+        .status-pending { background: #f59e0b; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .stat-card { background: #1e293b; border-radius: 12px; padding: 25px; text-align: center; }
+        .stat-value { font-size: 2.5rem; font-weight: bold; color: #60a5fa; }
+        .stat-label { color: #94a3b8; margin-top: 5px; }
+        .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: #1e293b; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; }
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .modal-title { font-size: 1.3rem; }
+        .close-btn { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #94a3b8; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #334155; border-radius: 8px; background: #0f172a; color: white; }
+        .form-group input:focus { outline: none; border-color: #60a5fa; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #334155; border: none; border-radius: 8px; color: white; cursor: pointer; }
+        .tab.active { background: #60a5fa; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 12px; text-align: right; border-bottom: 1px solid #334155; }
+        .table th { color: #94a3b8; }
+        .alert-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; }
+        .alert-email { background: #3b82f6; }
+        .alert-slack { background: #16a34a; }
+        .alert-discord { background: #8b5cf6; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🌐 <span>Sahel</span> Dev</div>
+        <div class="user-info">
+            <span class="user-name" id="userName">...</span>
+            <button class="btn btn-danger" onclick="logout()">خروج</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="grid" style="margin-bottom: 40px;">
+            <div class="stat-card">
+                <div class="stat-value" id="totalMonitors">0</div>
+                <div class="stat-label">المونيتورات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalPages">0</div>
+                <div class="stat-label">صفحات الحالة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalAlerts">0</div>
+                <div class="stat-label">قنوات التنبيه</div>
+            </div>
+        </div>
+
+        <!-- Monitors Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">📡 المونيتورات</h2>
+                <button class="btn btn-primary" onclick="showModal('monitorModal')">+ إضافة مونيتور</button>
+            </div>
+            <div id="monitorsList"></div>
+        </div>
+
+        <!-- Status Pages Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">📄 صفحات الحالة</h2>
+                <button class="btn btn-primary" onclick="showModal('statusPageModal')">+ إضافة صفحة</button>
+            </div>
+            <div id="statusPagesList"></div>
+        </div>
+
+        <!-- Alert Channels Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🔔 قنوات التنبيه</h2>
+                <button class="btn btn-primary" onclick="showModal('alertModal')">+ إضافة قناة</button>
+            </div>
+            <div id="alertsList"></div>
+        </div>
+    </div>
+
+    <!-- Monitor Modal -->
+    <div class="modal" id="monitorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">إضافة مونيتور جديد</h3>
+                <button class="close-btn" onclick="hideModal('monitorModal')">&times;</button>
+            </div>
+            <form id="monitorForm">
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" id="monitorName" required placeholder="مثال: API الرئيسية">
+                </div>
+                <div class="form-group">
+                    <label>الرابط</label>
+                    <input type="url" id="monitorUrl" required placeholder="https://api.example.com/health">
+                </div>
+                <div class="form-group">
+                    <label>الطريقة</label>
+                    <select id="monitorMethod">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>فترة الفحص (ثواني)</label>
+                    <input type="number" id="monitorInterval" value="300" min="60">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">إضافة</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('monitorModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Status Page Modal -->
+    <div class="modal" id="statusPageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">إضافة صفحة حالة</h3>
+                <button class="close-btn" onclick="hideModal('statusPageModal')">&times;</button>
+            </div>
+            <form id="statusPageForm">
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <input type="text" id="pageTitle" required placeholder="مثال: حالة النظام">
+                </div>
+                <div class="form-group">
+                    <label>Slug (رابط الصفحة)</label>
+                    <input type="text" id="pageSlug" required placeholder="مثال: my-status">
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <input type="text" id="pageDescription" placeholder="وصف الصفحة">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">إضافة</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('statusPageModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert Channel Modal -->
+    <div class="modal" id="alertModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">إضافة قناة تنبيه</h3>
+                <button class="close-btn" onclick="hideModal('alertModal')">&times;</button>
+            </div>
+            <form id="alertForm">
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" id="alertName" required placeholder="مثال: تنبيه الفريق">
+                </div>
+                <div class="form-group">
+                    <label>النوع</label>
+                    <select id="alertType">
+                        <option value="email">Email</option>
+                        <option value="slack">Slack</option>
+                        <option value="discord">Discord</option>
+                        <option value="sms">SMS</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الإعدادات (Webhook URL أو Email)</label>
+                    <input type="text" id="alertConfig" required placeholder="https://hooks.slack.com/...">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">إضافة</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideModal('alertModal')">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+
+        // Check auth on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            document.getElementById('userName').textContent = user.name || user.email;
+
+            loadData();
+        });
+
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            };
+        }
+
+        async function loadData() {
+            await Promise.all([
+                loadMonitors(),
+                loadStatusPages(),
+                loadAlertChannels()
+            ]);
+        }
+
+        async function loadMonitors() {
+            try {
+                const res = await fetch(`${API_URL}/monitors`, { headers: getHeaders() });
+                const data = await res.json();
+                document.getElementById('totalMonitors').textContent = data.length;
+
+                const container = document.getElementById('monitorsList');
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="empty-state">لا توجد مونيتورات. أضف أول مونيتور!</div>';
+                } else {
+                    container.innerHTML = data.map(m => `
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">${m.name}</span>
+                                <span class="status status-up">🟢 شغال</span>
+                            </div>
+                            <div style="color: #94a3b8; margin-bottom: 10px;">
+                                <code>${m.method} ${m.url}</code>
+                            </div>
+                            <div style="color: #64748b; font-size: 0.85rem;">
+                                فحص كل ${m.interval} ثانية
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load monitors:', err);
+            }
+        }
+
+        async function loadStatusPages() {
+            try {
+                const res = await fetch(`${API_URL}/status-pages`, { headers: getHeaders() });
+                const data = await res.json();
+                document.getElementById('totalPages').textContent = data.length;
+
+                const container = document.getElementById('statusPagesList');
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="empty-state">لا توجد صفحات حالة. أضف أول صفحة!</div>';
+                } else {
+                    container.innerHTML = data.map(p => `
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">${p.title}</span>
+                                <span class="status status-pending">📄 ${p.slug}</span>
+                            </div>
+                            <div style="color: #94a3b8;">${p.description || 'بدون وصف'}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load status pages:', err);
+            }
+        }
+
+        async function loadAlertChannels() {
+            try {
+                const res = await fetch(`${API_URL}/alerts`, { headers: getHeaders() });
+                const data = await res.json();
+                document.getElementById('totalAlerts').textContent = data.length;
+
+                const container = document.getElementById('alertsList');
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="empty-state">لا توجد قنوات تنبيه. أضف أول قناة!</div>';
+                } else {
+                    container.innerHTML = data.map(a => `
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">${a.name}</span>
+                                <span class="alert-badge alert-${a.channel_type}">${a.channel_type}</span>
+                            </div>
+                            <div style="color: #64748b; font-size: 0.85rem;">${a.config}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load alerts:', err);
+            }
+        }
+
+        // Monitor form
+        document.getElementById('monitorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('monitorName').value,
+                url: document.getElementById('monitorUrl').value,
+                method: document.getElementById('monitorMethod').value,
+                interval: parseInt(document.getElementById('monitorInterval').value)
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/monitors`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    hideModal('monitorModal');
+                    loadMonitors();
+                } else {
+                    const err = await res.json();
+                    alert(err.detail || 'حدث خطأ');
+                }
+            } catch (err) {
+                alert('لا يمكن الاتصال بالخادم');
+            }
+        });
+
+        // Status page form
+        document.getElementById('statusPageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                title: document.getElementById('pageTitle').value,
+                slug: document.getElementById('pageSlug').value,
+                description: document.getElementById('pageDescription').value
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/status-pages`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    hideModal('statusPageModal');
+                    loadStatusPages();
+                } else {
+                    const err = await res.json();
+                    alert(err.detail || 'حدث خطأ');
+                }
+            } catch (err) {
+                alert('لا يمكن الاتصال بالخادم');
+            }
+        });
+
+        // Alert channel form
+        document.getElementById('alertForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('alertName').value,
+                channel_type: document.getElementById('alertType').value,
+                config: document.getElementById('alertConfig').value
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/alerts`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    hideModal('alertModal');
+                    loadAlertChannels();
+                } else {
+                    const err = await res.json();
+                    alert(err.detail || 'حدث خطأ');
+                }
+            } catch (err) {
+                alert('لا يمكن الاتصال بالخادم');
+            }
+        });
+
+        function showModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function hideModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Close modal on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

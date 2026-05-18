@@ -12,16 +12,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     return {"message": "Sahel Dev API", "status": "running"}
+
 
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
 
+
 # Import routers
-from api import monitors, status_pages, alerts, auth
+from routes import auth, monitors, status_pages, alerts
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(monitors.router, prefix="/api/monitors", tags=["monitors"])

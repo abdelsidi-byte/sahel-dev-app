@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - Sahel Dev</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .container { width: 100%; max-width: 400px; padding: 20px; }
+        .logo { text-align: center; font-size: 2rem; margin-bottom: 40px; }
+        .logo span { color: #60a5fa; }
+        .card { background: #1e293b; padding: 40px; border-radius: 15px; }
+        h1 { text-align: center; margin-bottom: 30px; font-size: 1.5rem; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #94a3b8; }
+        input { width: 100%; padding: 12px 15px; border: 1px solid #334155; border-radius: 8px; background: #0f172a; color: white; font-size: 1rem; }
+        input:focus { outline: none; border-color: #60a5fa; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: linear-gradient(135deg, #60a5fa, #a78bfa); color: white; }
+        .btn-primary:hover { transform: scale(1.02); }
+        .btn-secondary { background: #334155; color: white; }
+        .btn-secondary:hover { background: #475569; }
+        .error { background: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; text-align: center; }
+        .success { background: #16a34a; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; text-align: center; }
+        .links { text-align: center; margin-top: 20px; color: #94a3b8; }
+        .links a { color: #60a5fa; text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🌐 <span>Sahel</span> Dev</div>
+        <div class="card">
+            <h1>تسجيل الدخول</h1>
+            <div id="error" class="error"></div>
+            <div id="success" class="success"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="email" required placeholder="example@email.com">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary">دخول</button>
+            </form>
+            <div class="links">
+                ليس لديك حساب؟ <a href="/signup.html">سجل هنا</a>
+            </div>
+            <div class="links" style="margin-top: 15px;">
+                <a href="/index.html">العودة للرئيسية</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('error');
+            const successEl = document.getElementById('success');
+
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    errorEl.textContent = data.detail || 'حدث خطأ';
+                    errorEl.style.display = 'block';
+                    return;
+                }
+
+                // Save token
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                successEl.textContent = 'تم تسجيل الدخول بنجاح!';
+                successEl.style.display = 'block';
+
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 1000);
+            } catch (err) {
+                errorEl.textContent = 'لا يمكن الاتصال بالخادم';
+                errorEl.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
