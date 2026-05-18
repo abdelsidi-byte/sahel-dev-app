@@ -247,20 +247,41 @@
                 if (data.length === 0) {
                     container.innerHTML = '<div class="empty-state">لا توجد مونيتورات. أضف أول مونيتور!</div>';
                 } else {
-                    container.innerHTML = data.map(m => `
+                    // Fetch stats for each monitor
+                    const monitorsWithStats = await Promise.all(
+                        data.map(async (m) => {
+                            try {
+                                const statsRes = await fetch(`${API_URL}/monitoring/${m.id}/stats`, { headers: getHeaders() });
+                                if (statsRes.ok) {
+                                    return { ...m, stats: await statsRes.json() };
+                                }
+                            } catch (e) {}
+                            return { ...m, stats: { uptime: 0, avg_response: 0 } };
+                        })
+                    );
+
+                    container.innerHTML = monitorsWithStats.map(m => {
+                        const uptimeClass = m.stats.uptime >= 90 ? 'status-up' : m.stats.uptime >= 50 ? 'status-pending' : 'status-down';
+                        const uptimeEmoji = m.stats.uptime >= 90 ? '🟢' : m.stats.uptime >= 50 ? '🟡' : '🔴';
+                        return `
                         <div class="card">
                             <div class="card-header">
                                 <span class="card-title">${m.name}</span>
-                                <span class="status status-up">🟢 شغال</span>
+                                <span class="${uptimeClass}">${uptimeEmoji} ${m.stats.uptime || 0}%</span>
                             </div>
                             <div style="color: #94a3b8; margin-bottom: 10px;">
                                 <code>${m.method} ${m.url}</code>
                             </div>
-                            <div style="color: #64748b; font-size: 0.85rem;">
-                                فحص كل ${m.interval} ثانية
+                            <div style="display: flex; gap: 20px; color: #64748b; font-size: 0.85rem;">
+                                <span>فحص كل ${m.interval} ثانية</span>
+                                <span>متوسط الاستجابة: ${m.stats.avg_response || 0}ms</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.8rem;" onclick="runCheckNow(${m.id})">🔄 فحص الآن</button>
+                                <button class="btn btn-danger" style="padding: 5px 12px; font-size: 0.8rem;" onclick="deleteMonitor(${m.id})">🗑️ حذف</button>
                             </div>
                         </div>
-                    `).join('');
+                    `}).join('');
                 }
             } catch (err) {
                 console.error('Failed to load monitors:', err);
@@ -401,6 +422,36 @@
                 alert('لا يمكن الاتصال بالخادم');
             }
         });
+
+        async function runCheckNow(monitorId) {
+            try {
+                const res = await fetch(`${API_URL}/monitoring/${monitorId}/run`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+                if (res.ok) {
+                    alert('✅ تم تشغيل الفحص بنجاح');
+                    loadMonitors();
+                }
+            } catch (err) {
+                alert('فشل تشغيل الفحص');
+            }
+        }
+
+        async function deleteMonitor(monitorId) {
+            if (!confirm('هل أنت متأكد من حذف هذا المونيتور؟')) return;
+            try {
+                const res = await fetch(`${API_URL}/monitors/${monitorId}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                if (res.ok) {
+                    loadMonitors();
+                }
+            } catch (err) {
+                alert('فشل حذف المونيتور');
+            }
+        }
 
         function showModal(id) {
             document.getElementById(id).classList.add('active');

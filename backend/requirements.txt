@@ -5,3 +5,4 @@ bcrypt==4.1.2
 PyJWT==2.8.0
 pydantic[email]==2.5.3
 python-multipart==0.0.6
+httpx==0.26.0

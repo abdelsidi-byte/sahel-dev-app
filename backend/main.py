@@ -24,9 +24,20 @@ async def health():
 
 
 # Import routers
-from routes import auth, monitors, status_pages, alerts
+from routes import auth, monitors, status_pages, alerts, monitoring
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(monitors.router, prefix="/api/monitors", tags=["monitors"])
+app.include_router(monitoring.router, prefix="/api/monitoring", tags=["monitoring"])
 app.include_router(status_pages.router, prefix="/api/status-pages", tags=["status-pages"])
 app.include_router(alerts.router, prefix="/api/alerts", tags=["alerts"])
+
+
+# Run monitoring manually
+@app.post("/api/run-monitoring")
+async def run_monitoring():
+    """Run monitoring check for all monitors (can be called by cron)"""
+    from worker import MonitoringWorker
+    worker = MonitoringWorker()
+    worker.run_all()
+    return {"message": "Monitoring check completed"}
