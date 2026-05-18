@@ -50,6 +50,7 @@ class Monitor(Base):
     owner = relationship("User", back_populates="monitors")
     checks = relationship("Check", back_populates="monitor")
     incidents = relationship("Incident", back_populates="monitor")
+    status_page_monitors = relationship("StatusPageMonitor", back_populates="monitor")
 
 
 class StatusPage(Base):
@@ -114,6 +115,10 @@ class StatusPageMonitor(Base):
     id = Column(Integer, primary_key=True, index=True)
     status_page_id = Column(Integer, ForeignKey("status_pages.id"), nullable=False)
     monitor_id = Column(Integer, ForeignKey("monitors.id"), nullable=False)
+
+    # Relationships
+    status_page = relationship("StatusPage", back_populates="monitors")
+    monitor = relationship("Monitor", back_populates="status_page_monitors")
 
 
 # Database dependency

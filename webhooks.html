@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات التنبيهات - Sahel Dev</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: white; min-height: 100vh; }
+        .header { background: #1e293b; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .logo { font-size: 1.5rem; }
+        .logo span { color: #60a5fa; }
+        .container { max-width: 800px; margin: 0 auto; padding: 30px; }
+        .card { background: #1e293b; border-radius: 12px; padding: 25px; margin-bottom: 20px; }
+        h1 { font-size: 1.8rem; margin-bottom: 20px; }
+        h2 { font-size: 1.3rem; margin-bottom: 15px; color: #60a5fa; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #94a3b8; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #334155; border-radius: 8px; background: #0f172a; color: white; }
+        .form-group input:focus { outline: none; border-color: #60a5fa; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; }
+        .btn-primary { background: linear-gradient(135deg, #60a5fa, #a78bfa); color: white; }
+        .btn-primary:hover { transform: scale(1.02); }
+        .alert-list { margin-top: 20px; }
+        .alert-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #0f172a; border-radius: 8px; margin-bottom: 10px; }
+        .alert-info { display: flex; align-items: center; gap: 15px; }
+        .alert-badge { padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; }
+        .badge-slack { background: #16a34a; }
+        .badge-discord { background: #8b5cf6; }
+        .badge-email { background: #3b82f6; }
+        .btn-danger { background: #dc2626; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; }
+        .instructions { background: #0f172a; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .instructions h3 { color: #60a5fa; margin-bottom: 10px; }
+        .instructions code { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; }
+        .instructions ol { margin-right: 20px; color: #94a3b8; line-height: 1.8; }
+        .test-result { padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+        .test-success { background: #16a34a; }
+        .test-error { background: #dc2626; }
+        .back-link { color: #60a5fa; text-decoration: none; margin-bottom: 20px; display: inline-block; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🌐 <span>Sahel</span> Dev</div>
+        <a href="/dashboard.html" class="back-link" style="color: white;">← لوحة التحكم</a>
+    </div>
+
+    <div class="container">
+        <h1>🔔 إعدادات التنبيهات</h1>
+
+        <!-- Slack Instructions -->
+        <div class="card">
+            <h2>💬 Slack Webhook</h2>
+            <div class="instructions">
+                <h3>📋 خطوات الحصول على Webhook:</h3>
+                <ol>
+                    <li>اذهب إلى <a href="https://api.slack.com/apps" target="_blank" style="color: #60a5fa;">Slack API</a></li>
+                    <li>اختر App ثم اذهب إلى Incoming Webhooks</li>
+                    <li>فعّل Webhooks وأنشئ واحد جديد</li>
+                    <li>اختر Channel (مثل #alerts)</li>
+                    <li>انسخ Webhook URL</li>
+                </ol>
+            </div>
+            <form id="slackForm">
+                <div class="form-group">
+                    <label>Webhook URL</label>
+                    <input type="text" id="slackUrl" placeholder="https://hooks.slack.com/services/...">
+                </div>
+                <button type="submit" class="btn btn-primary">إضافة Slack</button>
+            </form>
+            <div id="slackTest" class="test-result"></div>
+        </div>
+
+        <!-- Discord Instructions -->
+        <div class="card">
+            <h2>🎮 Discord Webhook</h2>
+            <div class="instructions">
+                <h3>📋 خطوات الحصول على Webhook:</h3>
+                <ol>
+                    <li>اذهب إلى Server Settings → Integrations</li>
+                    <li>اضغط على Webhooks → New Webhook</li>
+                    <li>اختر اسم للقناة (مثل "Alerts")</li>
+                    <li>انسخ Webhook URL</li>
+                </ol>
+            </div>
+            <form id="discordForm">
+                <div class="form-group">
+                    <label>Webhook URL</label>
+                    <input type="text" id="discordUrl" placeholder="https://discord.com/api/webhooks/...">
+                </div>
+                <button type="submit" class="btn btn-primary">إضافة Discord</button>
+            </form>
+            <div id="discordTest" class="test-result"></div>
+        </div>
+
+        <!-- Email Instructions -->
+        <div class="card">
+            <h2>📧 تنبيه بالبريد</h2>
+            <div class="instructions">
+                <h3>📋 الإعدادات:</h3>
+                <ol>
+                    <li>أدخل بريدك الإلكتروني</li>
+                    <li>سيتم إرسال إشعار عند توقف أي API</li>
+                </ol>
+            </div>
+            <form id="emailForm">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="emailAddr" placeholder="your@email.com">
+                </div>
+                <button type="submit" class="btn btn-primary">إضافة Email</button>
+            </form>
+        </div>
+
+        <!-- Active Alerts List -->
+        <div class="card">
+            <h2>📊 القنوات المفعلة</h2>
+            <div id="alertsList" class="alert-list">
+                <div style="color: #94a3b8; text-align: center; padding: 20px;">جاري التحميل...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            loadAlerts();
+        });
+
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            };
+        }
+
+        async function loadAlerts() {
+            try {
+                const res = await fetch(`${API_URL}/alerts`, { headers: getHeaders() });
+                const data = await res.json();
+
+                const container = document.getElementById('alertsList');
+                if (data.length === 0) {
+                    container.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 20px;">لا توجد قنوات مفعلة</div>';
+                } else {
+                    container.innerHTML = data.map(a => `
+                        <div class="alert-item">
+                            <div class="alert-info">
+                                <span class="alert-badge badge-${a.channel_type}">${a.channel_type}</span>
+                                <span>${a.name}</span>
+                            </div>
+                            <button class="btn-danger" onclick="deleteAlert(${a.id})">حذف</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                document.getElementById('alertsList').innerHTML = '<div style="color: #dc2626;">فشل تحميل القنوات</div>';
+            }
+        }
+
+        document.getElementById('slackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await addAlert('slack', 'Slack Alert', document.getElementById('slackUrl').value, 'slackTest');
+        });
+
+        document.getElementById('discordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await addAlert('discord', 'Discord Alert', document.getElementById('discordUrl').value, 'discordTest');
+        });
+
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await addAlert('email', 'Email Alert', document.getElementById('emailAddr').value, 'emailTest');
+        });
+
+        async function addAlert(type, name, config, testId) {
+            const testEl = document.getElementById(testId);
+
+            if (!config) {
+                testEl.className = 'test-result test-error';
+                testEl.textContent = '❌ الرجاء إدخال الـ URL أو البريد';
+                testEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/alerts`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ name, channel_type: type, config })
+                });
+
+                if (res.ok) {
+                    testEl.className = 'test-result test-success';
+                    testEl.textContent = '✅ تم إضافة القناة بنجاح!';
+                    testEl.style.display = 'block';
+
+                    // Clear form
+                    if (type === 'slack') document.getElementById('slackUrl').value = '';
+                    if (type === 'discord') document.getElementById('discordUrl').value = '';
+                    if (type === 'email') document.getElementById('emailAddr').value = '';
+
+                    loadAlerts();
+
+                    // Hide after 3 seconds
+                    setTimeout(() => { testEl.style.display = 'none'; }, 3000);
+                } else {
+                    const err = await res.json();
+                    testEl.className = 'test-result test-error';
+                    testEl.textContent = '❌ ' + (err.detail || 'حدث خطأ');
+                    testEl.style.display = 'block';
+                }
+            } catch (err) {
+                testEl.className = 'test-result test-error';
+                testEl.textContent = '❌ فشل الاتصال بالخادم';
+                testEl.style.display = 'block';
+            }
+        }
+
+        async function deleteAlert(id) {
+            if (!confirm('هل تريد حذف هذه القناة؟')) return;
+
+            try {
+                const res = await fetch(`${API_URL}/alerts/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+
+                if (res.ok) {
+                    loadAlerts();
+                }
+            } catch (err) {
+                alert('فشل حذف القناة');
+            }
+        }
+    </script>
+</body>
+</html>
