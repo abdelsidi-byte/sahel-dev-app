@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آلة حاسبة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+            direction: ltr;
+        }
+
+        .display-expr {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            min-height: 24px;
+            word-break: break-all;
+        }
+
+        .display-result {
+            color: #fff;
+            font-size: 36px;
+            font-weight: 300;
+            word-break: break-all;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-num {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-num:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-op {
+            background: rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+        }
+
+        .btn-op:hover {
+            background: rgba(78, 205, 196, 0.5);
+        }
+
+        .btn-eq {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: #fff;
+            grid-column: span 2;
+        }
+
+        .btn-clear {
+            background: rgba(255, 82, 82, 0.3);
+            color: #ff5252;
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 82, 82, 0.5);
+        }
+
+        .btn-backspace {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+
+        .btn-backspace:hover {
+            background: rgba(255, 193, 7, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="display-expr" id="expr"></div>
+            <div class="display-result" id="result">0</div>
+        </div>
+        <div class="buttons">
+            <button class="btn-clear" onclick="clearAll()">AC</button>
+            <button class="btn-backspace" onclick="backspace()">⌫</button>
+            <button class="btn-op" onclick="append('%')">%</button>
+            <button class="btn-op" onclick="append('/')">÷</button>
+
+            <button class="btn-num" onclick="append('7')">7</button>
+            <button class="btn-num" onclick="append('8')">8</button>
+            <button class="btn-num" onclick="append('9')">9</button>
+            <button class="btn-op" onclick="append('*')">×</button>
+
+            <button class="btn-num" onclick="append('4')">4</button>
+            <button class="btn-num" onclick="append('5')">5</button>
+            <button class="btn-num" onclick="append('6')">6</button>
+            <button class="btn-op" onclick="append('-')">−</button>
+
+            <button class="btn-num" onclick="append('1')">1</button>
+            <button class="btn-num" onclick="append('2')">2</button>
+            <button class="btn-num" onclick="append('3')">3</button>
+            <button class="btn-op" onclick="append('+')">+</button>
+
+            <button class="btn-num" onclick="append('00')">00</button>
+            <button class="btn-num" onclick="append('0')">0</button>
+            <button class="btn-num" onclick="append('.')">.</button>
+            <button class="btn-eq" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let expression = '';
+
+        function append(val) {
+            expression += val;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            expression = '';
+            document.getElementById('result').textContent = '0';
+            document.getElementById('expr').textContent = '';
+        }
+
+        function backspace() {
+            expression = expression.slice(0, -1);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('expr').textContent = expression;
+            try {
+                if (expression !== '') {
+                    let result = eval(expression);
+                    if (!isNaN(result) && isFinite(result)) {
+                        document.getElementById('result').textContent = 
+                            Number.isInteger(result) ? result : result.toFixed(8).replace(/\.?0+$/, '');
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function calculate() {
+            try {
+                let result = eval(expression);
+                if (!isNaN(result) && isFinite(result)) {
+                    document.getElementById('expr').textContent = expression + ' =';
+                    expression = String(result);
+                    document.getElementById('result').textContent = 
+                        Number.isInteger(result) ? result : result.toFixed(8).replace(/\.?0+$/, '');
+                } else {
+                    document.getElementById('result').textContent = 'خطأ';
+                }
+            } catch (e) {
+                document.getElementById('result').textContent = 'خطأ';
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key >= '0' && e.key <= '9') append(e.key);
+            else if (e.key === '.') append('.');
+            else if (e.key === '+') append('+');
+            else if (e.key === '-') append('-');
+            else if (e.key === '*') append('*');
+            else if (e.key === '/') append('/');
+            else if (e.key === '%') append('%');
+            else if (e.key === 'Enter' || e.key === '=') calculate();
+            else if (e.key === 'Backspace') backspace();
+            else if (e.key === 'Escape') clearAll();
+        });
+    </script>
+</body>
+</html>
